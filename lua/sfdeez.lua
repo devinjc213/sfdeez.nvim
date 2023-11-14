@@ -52,9 +52,6 @@ local function run_test_file()
     on_stdout = function(_, data, _)
       vim.api.nvim_buf_set_lines(new_buffer, 0, -1, false, vim.split(data, '\n'))
     end,
-    on_exit = function(_, _)
-      vim.cmd('normal! ggVGd')
-    end,
   })
 
   vim.cmd('wincmd w')
@@ -72,9 +69,6 @@ local function run_test_at_cursor()
   local job = vim.fn.jobstart(cmd, {
     on_stdout = function(_, data, _)
       vim.api.nvim_buf_set_lines(new_buffer, 0, -1, false, vim.split(data, '\n'))
-    end,
-    on_exit = function(_, _)
-      vim.cmd('normal! ggVGd')
     end,
   })
 
