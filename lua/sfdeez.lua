@@ -1,14 +1,8 @@
-local M = {}
-
-function M.auth(alias)
+function auth(alias)
   local job = vim.fn.jobstart('sfdx force:auth:web:login -a ' .. alias, {})
 end
 
-vim.cmd(
-  "command! -nargs=1 SFDXAuth lua auth(<args>)"
-)
-
-function M.sfdx_create_class(name)
+function create_class(name)
   local job = vim.fn.jobstart('sfdx force:apex:class:create -n ' .. name, {
     on_exit = function(_, code)
       if code == 0 then
@@ -18,11 +12,7 @@ function M.sfdx_create_class(name)
   })
 end
 
-vim.cmd(
-  "command! -nargs=1 SFDXCreateClass lua sfdx_create_class(<args>)"
-)
-
-function M.sfdx_create_trigger(name)
+function create_trigger(name)
   local job = vim.fn.jobstart('sfdx force:apex:trigger:create -n ' .. name, {
     on_exit = function(_, code)
       if code == 0 then
@@ -32,14 +22,8 @@ function M.sfdx_create_trigger(name)
   })
 end
 
-vim.cmd(
-  "command! -nargs=1 SFDXCreateTrigger lua sfdx_create_trigger(<args>)"
-)
-
-function M.deploy()
+function deploy()
   local current_file = vim.fn.expand('%:p')
   local cmd = 'sfdx force:source:deploy -p ' .. current_file
   vim.cmd('! ' .. cmd)
 end
-
-return M
