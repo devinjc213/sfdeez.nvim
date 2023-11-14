@@ -44,7 +44,7 @@ local function run_test_file()
   local current_file = vim.fn.expand('%:p')
   local cmd = 'sfdx force:apex:test:run -l RunLocalTests -r human -w 10 -c -d ' .. current_file
 
-  vim.cmd('hsplit')
+  vim.cmd('split')
 
   local new_buffer = vim.fn.bufnr('%')
 
