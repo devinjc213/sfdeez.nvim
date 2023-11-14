@@ -85,7 +85,7 @@ return {
   auth = auth,
   create_class = create_class,
   create_trigger = create_trigger,
-  deploy = deploy
+  deploy = deploy,
   run_test_file = run_test_file,
   run_test_at_cursor = run_test_at_cursor,
 }
