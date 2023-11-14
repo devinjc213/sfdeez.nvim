@@ -4,6 +4,10 @@ function M.auth(alias)
   local job = vim.fn.jobstart('sfdx force:auth:web:login -a ' .. alias, {})
 end
 
+vim.cmd(
+  "command! -nargs=1 SFDXAuth lua auth(<args>)"
+)
+
 function M.sfdx_create_class(name)
   local job = vim.fn.jobstart('sfdx force:apex:class:create -n ' .. name, {
     on_exit = function(_, code)
