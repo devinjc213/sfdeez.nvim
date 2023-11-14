@@ -1,5 +1,5 @@
 local function auth(alias)
-  local job = vim.fn.jobstart('sfdx force:auth:web:login -a ' .. alias, {})
+  local job = vim.fn.jobstart('sfdx force:auth:web:login -a ' .. alias)
 end
 
 local function create_class(name)
