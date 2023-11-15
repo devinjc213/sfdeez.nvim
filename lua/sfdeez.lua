@@ -61,8 +61,9 @@ local function deploy_file()
 end
 
 local function run_test_file()
-  local current_file = vim.fn.expand('%:t:r')
-  local cmd = '! sfdx force:apex:test:run -n' .. current_file .. '-r human --synchronous'
+  local full_path = vim.fn.expand('%:p')
+  local file_name = full_path:match(".*/(.-)%.") or full_path:match(".*/(.-)$") or full_path
+  local cmd = '! sfdx force:apex:test:run -n ' .. file_name .. ' -r human --synchronous'
 
   buf_handler(cmd)
 end
