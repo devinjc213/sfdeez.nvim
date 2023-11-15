@@ -33,6 +33,12 @@ local function auth(alias)
   buf_handler(cmd)
 end
 
+local function logout()
+  local cmd = 'sfdx force:auth:logout -a -p'
+
+  buf_handler(cmd)
+end
+
 local function create_class(name)
   if not name or name == '' then
     name = vim.fn.input('Class Name: ')
@@ -54,31 +60,50 @@ local function create_trigger(name)
 end
 
 local function deploy_file()
-  local current_file = vim.fn.expand('%:p')
+  local current_file = vim.fn.expand('%:t:r')
+
   local cmd = 'sfdx force:source:deploy -p ' .. current_file
 
   buf_handler(cmd)
 end
 
 local function run_test_file()
-  local full_path = vim.fn.expand('%:p')
-  local file_name = full_path:match(".*/(.-)%.") or full_path:match(".*/(.-)$") or full_path
-  local cmd = '! sfdx force:apex:test:run -n ' .. file_name .. ' -r human --synchronous'
+  local current_file = vim.fn.expand('%:t:r')
+  local cmd = '! sfdx force:apex:test:run -n ' .. current_file .. ' -r human --synchronous'
 
   buf_handler(cmd)
 end
 
 local function run_test_at_cursor()
-  -- TODO: get test func closest to cursor
   local current_file = vim.fn.expand('%:t:r')
-  local current_test = 'Test.TestFunc'
-  local cmd = 'sfdx force:apex:test:run -n ' .. current_test .. '-r human --synchronous'
+  local current_line = vim.fn.line('.')
+  local current_buf = vim.fn.bufnr('%')
+
+  local is_test_line = current_line
+  while is_test_line > 0 do
+    local line_content = vim.api.nvim_buf_get_lines(current_buf, is_test_line - 1, is_test_line, false)[1]
+    if line_content:find('@isTest') then
+      break
+    end
+    is_test_line = is_test_line - 1
+  end
+
+  if is_test_line == 0 then
+    print('No test found.  Please make sure cursor is at or below @isTest annotation.')
+    return
+  end
+
+  local test_line = vim.api.nvim_buf_get_lines(current_buf, is_test_line, is_test_line + 1, false)[1]
+  local test_name = test_line:match('(%a[%w_]*%s*)%b()')
+
+  local cmd = '! sfdx force:apex:test:run -n ' .. current_file .. '.' .. test_name .. ' -r human --synchronous' 
 
   buf_handler(cmd)
 end
 
 return {
   auth = auth,
+  logout = logout,
   create_class = create_class,
   create_trigger = create_trigger,
   deploy_file = deploy_file,

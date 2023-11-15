@@ -4,6 +4,7 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 command! -nargs=* SFDXAuth lua require'sfdeez'.auth(<f-args>)
+command! SFDXLogout lua require'sfdeez'.logout()
 command! -nargs=* SFDXCreateClass lua require'sfdeez'.create_class(<f-args>)
 command! -nargs=* SFDXCreateTrigger lua require'sfdeez'.create_trigger(<f-args>)
 command! SFDXDeployFile = lua require'sfdeez'.deploy_file()
