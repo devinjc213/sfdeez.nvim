@@ -1,9 +1,36 @@
+local function buf_handler(cmd)
+  vim.cmd('below split | enew')
+  vim.cmd('resize 10')
+
+  local message_buffer = vim.fn.bufnr('%')
+
+  vim.api.nvim_buf_set_option(message_buffer, 'buftype', 'nofile')
+  vim.api.nvim_buf_set_option(message_buffer, 'swapfile', false)
+  vim.api.nvim_buf_set_option(message_buffer, 'bufhidden', 'wipe')
+
+  local job = vim.fn.jobstart(cmd, {
+    stdout_buffered = true,
+    on_stdout = function(_, data)
+      if data then
+        vim.api.nvim_buf_set_lines(message_buffer, -1, -1, false, data)
+      end
+    end,
+    on_stderr = function(_, data)
+      if data then
+        vim.api.nvim_buf_set_lines(message_buffer, -1, -1, false, data)
+      end
+    end, 
+  })
+end
+
 local function auth(alias)
   if not alias or alias == '' then
     alias = vim.fn.input('Alias: ')
   end
 
-  local job = vim.fn.jobstart('sfdx force:auth:web:login -a ' .. alias)
+  local cmd = 'sfdx force:auth:web:login -a ' .. alias
+
+  buf_handler(cmd)
 end
 
 local function create_class(name)
@@ -11,50 +38,33 @@ local function create_class(name)
     name = vim.fn.input('Class Name: ')
   end
 
-  local job = vim.fn.jobstart('sfdx force:apex:class:create -n ' .. name, {
-    on_exit = function(_, code)
-      if code == 0 then
-        vim.cmd('! sfdx force:source:open -n ' .. name)
-      end
-    end
-  })
+  local cmd = 'sfdx force:apex:class:create -n ' .. name
+
+  buf_handler(cmd)
 end
 
 local function create_trigger(name)
   if not name or name == '' then
     name = vim.fn.input('Trigger Name: ')
   end
+  
+  local cmd = 'sfdx force:apex:trigger:create -n ' .. name
 
-  local job = vim.fn.jobstart('sfdx force:apex:trigger:create -n ' .. name, {
-    on_exit = function(_, code)
-      if code == 0 then
-        vim.cmd('! sfdx force:source:open -n ' .. name)
-      end
-    end
-  })
+  buf_handler(cmd)
 end
 
-local function deploy()
+local function deploy_file()
   local current_file = vim.fn.expand('%:p')
   local cmd = 'sfdx force:source:deploy -p ' .. current_file
-  vim.cmd('! ' .. cmd)
+
+  buf_handler(cmd)
 end
 
 local function run_test_file()
   local current_file = vim.fn.expand('%:p')
-  local cmd = 'sfdx force:apex:test:run -l RunLocalTests -r human -w 10 -c -d ' .. current_file
+  local cmd = '! sfdx force:apex:test:run -l RunLocalTests -r human -w 10 -c -d ' .. current_file
 
-  vim.cmd('split')
-
-  local new_buffer = vim.fn.bufnr('%')
-
-  local job = vim.fn.jobstart(cmd, {
-    on_stdout = function(_, data, _)
-      vim.api.nvim_buf_set_lines(new_buffer, 0, -1, false, vim.split(data, '\n'))
-    end,
-  })
-
-  vim.cmd('wincmd w')
+  buf_handler(cmd)
 end
 
 local function run_test_at_cursor()
@@ -62,24 +72,14 @@ local function run_test_at_cursor()
   local current_line = vim.fn.line('.')
   local cmd = 'sfdx force:apex:test:run -l RunLocalTests -r human -w 10 -c -d ' .. current_file .. ' -n ' .. current_line
 
-  vim.cmd('split')
-
-  local new_buffer = vim.fn.bufnr('%')
-
-  local job = vim.fn.jobstart(cmd, {
-    on_stdout = function(_, data, _)
-      vim.api.nvim_buf_set_lines(new_buffer, 0, -1, false, vim.split(data, '\n'))
-    end,
-  })
-
-  vim.cmd('wincmd w')
+  buf_handler(cmd)
 end
 
 return {
   auth = auth,
   create_class = create_class,
   create_trigger = create_trigger,
-  deploy = deploy,
+  deploy_file = deploy_file,
   run_test_file = run_test_file,
   run_test_at_cursor = run_test_at_cursor,
 }
