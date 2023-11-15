@@ -61,16 +61,17 @@ local function deploy_file()
 end
 
 local function run_test_file()
-  local current_file = vim.fn.expand('%:p')
-  local cmd = '! sfdx force:apex:test:run -l RunLocalTests -r human -w 10 -c -d ' .. current_file
+  local current_file = vim.fn.expand('%:t:r')
+  local cmd = '! sfdx force:apex:test:run -n' .. current_file .. '-r human --synchronous'
 
   buf_handler(cmd)
 end
 
 local function run_test_at_cursor()
-  local current_file = vim.fn.expand('%:p')
-  local current_line = vim.fn.line('.')
-  local cmd = 'sfdx force:apex:test:run -l RunLocalTests -r human -w 10 -c -d ' .. current_file .. ' -n ' .. current_line
+  -- TODO: get test func closest to cursor
+  local current_file = vim.fn.expand('%:t:r')
+  local current_test = 'Test.TestFunc'
+  local cmd = 'sfdx force:apex:test:run -n ' .. current_test .. '-r human --synchronous'
 
   buf_handler(cmd)
 end
