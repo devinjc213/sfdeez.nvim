@@ -5,3 +5,4 @@ Auth/logout, creating triggers/classes, testing file and methods should be worki
 
 ## TODO
 - Figure out refresh all SObject definitions
+- Move all commands from sfdx to sf 
