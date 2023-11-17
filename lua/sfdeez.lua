@@ -28,13 +28,13 @@ local function auth(alias)
     alias = vim.fn.input('Alias: ')
   end
 
-  local cmd = 'sfdx force:auth:web:login -a ' .. alias
+  local cmd = '! sf org login web --alias ' .. alias .. ' --instance-url https://test.salesforce.com --set-default'
 
   buf_handler(cmd)
 end
 
 local function logout()
-  local cmd = 'sfdx force:auth:logout -a -p'
+  local cmd = '! sf org logout --all --no-prompt'
 
   buf_handler(cmd)
 end
@@ -44,7 +44,7 @@ local function create_class(name)
     name = vim.fn.input('Class Name: ')
   end
 
-  local cmd = 'sfdx force:apex:class:create -n ' .. name
+  local cmd = '! sf apex generate class --name ' .. name
 
   buf_handler(cmd)
 end
@@ -54,7 +54,7 @@ local function create_trigger(name)
     name = vim.fn.input('Trigger Name: ')
   end
   
-  local cmd = 'sfdx force:apex:trigger:create -n ' .. name
+  local cmd = '! sf apex generate trigger --name ' .. name
 
   buf_handler(cmd)
 end
@@ -62,18 +62,18 @@ end
 local function deploy_file()
   local current_file = vim.fn.expand('%:t:r')
 
-  local cmd = 'sfdx force:source:deploy -p ' .. current_file
+  local cmd = '! sf project deploy start --metadata ' .. current_file
 
   buf_handler(cmd)
 end
 
 local function run_test_file()
   local current_file = vim.fn.expand('%:t:r')
-  local cmd = '! sfdx force:apex:test:run -n ' .. current_file .. ' -r human --synchronous'
+  local cmd = '! sf apex run test --class-names ' .. current_file .. ' --result-format human --synchronous'
 
   buf_handler(cmd)
 end
-
+ 
 local function run_test_at_cursor()
   local current_file = vim.fn.expand('%:t:r')
   local current_line = vim.fn.line('.')
@@ -96,7 +96,7 @@ local function run_test_at_cursor()
   local test_line = vim.api.nvim_buf_get_lines(current_buf, is_test_line, is_test_line + 1, false)[1]
   local test_name = test_line:match('(%a[%w_]*%s*)%b()')
 
-  local cmd = '! sfdx force:apex:test:run -n ' .. current_file .. '.' .. test_name .. ' -r human --synchronous' 
+  local cmd = '! sf apex run test --tests ' .. current_file .. '.' .. test_name .. ' --result-format human --synchronous' 
 
   buf_handler(cmd)
 end
