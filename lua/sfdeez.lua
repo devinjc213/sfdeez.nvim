@@ -50,10 +50,10 @@ local function create_class(name)
 end
 
 local function create_trigger(name)
-  if not name or name == '' then
+if not name or name == '' then
     name = vim.fn.input('Trigger Name: ')
   end
-  
+
   local cmd = '! sf apex generate trigger --name ' .. name
 
   buf_handler(cmd)
